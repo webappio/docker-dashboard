@@ -12,11 +12,11 @@ ENV NODE_OPTIONS=--max-old-space-size=8192
 
 COPY . .
 
-RUN cd docker_dashboard
+RUN cd docker-dashboard
 RUN npm install
 RUN BACKGROUND npm start
 
-RUN cd ../docker_dashboard_server
+RUN cd ../docker-dashboard-server
 RUN npm install
 RUN BACKGROUND npm start
 
