@@ -9,9 +9,7 @@ RUN curl -fSsL https://deb.nodesource.com/setup_12.x | bash && \
 MEMORY 2G
 ENV NODE_OPTIONS=--max-old-space-size=8192
 
-COPY . .
-
-WORKDIR docker-dashboard
+WORKDIR docker-dash-app/docker-dashboard-front-end
 RUN npm install
 RUN BACKGROUND npm start
 

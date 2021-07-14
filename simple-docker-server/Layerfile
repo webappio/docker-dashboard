@@ -12,7 +12,7 @@ RUN apt-get update && \
     apt install docker-ce
 
 # copy files from the repository into this staging server
-COPY . .
+WORKDIR simple-docker-server
 
 RUN docker build -t image .
 RUN docker run -d -p 8080:8080 image
