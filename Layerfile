@@ -22,4 +22,4 @@ RUN BACKGROUND npm start
 
 # Create a unique link to share the app in this runner.
 # Every time someone clicks the link, we'll wake up this staging server.
-EXPOSE WEBSITE http://localhost:3000
+EXPOSE WEBSITE http://localhost:3000 /docker-dashboard
