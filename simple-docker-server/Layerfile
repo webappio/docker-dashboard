@@ -1,5 +1,5 @@
 #This is an example LayerCI configuration for Docker!
-FROM /Layerfile
+FROM vm/ubuntu:18.04
 
 # To note: Layerfiles create entire VMs, *not* containers!
 
