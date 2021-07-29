@@ -1,5 +1,5 @@
 #This is an example LayerCI configuration for React!
-FROM vm/ubuntu:18.04
+FROM vm/ubuntu:20.04
 COPY . .
 # To note: Layerfiles create entire VMs, *not* containers!
 
