@@ -57,5 +57,5 @@ app.ws('/container/:id/logs', (ws, req) => {
 });
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}!`)
+    console.log(`Docker plugin dashboard listening on port ${port}!`)
 });
