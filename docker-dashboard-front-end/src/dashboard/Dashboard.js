@@ -80,7 +80,6 @@ function Dashboard() {
                             <TableCell align="right">COMMAND</TableCell>
                             <TableCell align="right">CREATED</TableCell>
                             <TableCell align="right">STATUS</TableCell>
-                            <TableCell align="right">PORTS</TableCell>
                             <TableCell align="right">NAMES</TableCell>
                         </TableRow>
                     </TableHead>
