@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -8,71 +7,34 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TablePagination from '@material-ui/core/TablePagination';
 import Paper from '@material-ui/core/Paper';
-import TextField from '@material-ui/core/TextField';
-import {Button} from "@material-ui/core";
-<<<<<<< HEAD
 import {Link} from "react-router-dom";
 import Box from '@material-ui/core/Box';
-=======
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-    Link
-} from "react-router-dom";
->>>>>>> 628ae4f (added ip box to connect with remote docker daemon)
-
-const useStyles = makeStyles((theme) =>({
-    root: {
-        '& > *': {
-            margin: theme.spacing(1),
-            width: '25ch',
-        },
-    }
-}));
+import {Typography} from '@material-ui/core';
+import {useParams} from "react-router-dom";
 
 function Dashboard() {
+    const controller = new AbortController()
+    // abort fetch after 5 seconds
+    setTimeout(() => controller.abort(), 5000)
     const [containers, setContainers] = useState([]);
-    const [ip, setIp] = useState('');
-<<<<<<< HEAD
-    const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(5);
-=======
->>>>>>> 628ae4f (added ip box to connect with remote docker daemon)
-    const fetchContainer = () => {
-        fetch("/containers")
-        .then(res => res.json())
-        .then(
-            (result) => {
-              console.log(result);
-              setContainers(result)
-            }
-<<<<<<< HEAD
-        ).catch((reason) => {
-=======
-        ).catch( (reason) => {
->>>>>>> 628ae4f (added ip box to connect with remote docker daemon)
-            console.log(reason);
-        })
+    const [page, setPage] = useState(0);
+    const [error, setError] = useState(false);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const { jobuuid } = useParams();
+
+    const fetchContainer = async () => {
+        try {
+            const res = await fetch(`/${jobuuid}/containers/`, {
+                signal : controller.signal
+            })
+            const result = await res.json()
+            setContainers(result)
+            setError(false)
+        } catch (reason) {
+            console.error(reason)
+            setError(true)
+        }
     }
-    const setip = () => {
-        fetch('/setip', {
-            method: 'POST',
-            headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-            body: JSON.stringify({host : ip})
-        }).then(
-            (result) => {
-                console.log(result);
-                fetchContainer();
-            }
-        ).catch((reason) => {
-            console.log(reason);
-        })
-    }
-<<<<<<< HEAD
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
@@ -80,31 +42,18 @@ function Dashboard() {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
-    const classes = useStyles();
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, containers.length - page * rowsPerPage);
-=======
-
-    const classes = useStyles();
->>>>>>> 628ae4f (added ip box to connect with remote docker daemon)
-    useEffect(() => {
-        fetchContainer();
-    }, [])
-    const handleChange = (event) => {
-        setIp(event.target.value);
-    };
+    
+    // eslint-disable-next-line
+    useEffect(() => fetchContainer(), [])
 
     return (
         <React.Fragment>
-<<<<<<< HEAD
-            <form className={classes.root}>
-                <TextField id="standard-basic" label="enter ip address" onChange={handleChange} />
-                <Button
-                    onClick={setip}
-                    variant={'outlined'}>
-                    Connect
-                </Button>
-            </form>
             <Box m={5}>
+                {error ? 
+                <Typography>
+                    Could not connect to docker error
+                </Typography> : 
                 <TableContainer component={Paper}>
                     <Table>
                         <TableHead>
@@ -124,7 +73,7 @@ function Dashboard() {
                             ).map(container => (
                                 <TableRow key={container.Id}>
                                     <TableCell component="th" scope="row">
-                                        <Link to={"/container/" + container.Id} >{container.Id.substring(0, 11)}</Link>
+                                        <Link to={`/${jobuuid}/container/${container.Id}`} >{container.Id.substring(0, 11)}</Link>
                                     </TableCell>
                                     <TableCell align="right">{container.ImageID.substring(7, 19)}</TableCell>
                                     <TableCell align="right">{container.Command}</TableCell>
@@ -153,45 +102,10 @@ function Dashboard() {
                         />
                     </Table>
                 </TableContainer>
+            }
             </Box>
-=======
-            <TextField id="standard-basic" label="enter ip address" onChange={handleChange} />
-            <Button
-                onClick={setip}
-                variant={'outlined'}>
-                Connect
-            </Button>
-            <TableContainer component={Paper}>
-                <Table className={classes.table}>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>CONTAINER ID</TableCell>
-                            <TableCell align="right">IMAGE</TableCell>
-                            <TableCell align="right">COMMAND</TableCell>
-                            <TableCell align="right">CREATED</TableCell>
-                            <TableCell align="right">STATUS</TableCell>
-                            <TableCell align="right">NAMES</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {containers.map(container => (
-                            <TableRow key={container.Id}>
-                                <TableCell component="th" scope="row">
-                                    <Link to={"/container/" + container.Id} >{container.Id.substring(0, 11)}</Link>
-                                </TableCell>
-                                <TableCell align="right">{container.ImageID.substring(7, 19)}</TableCell>
-                                <TableCell align="right">{container.Command}</TableCell>
-                                <TableCell align="right">{container.Created}</TableCell>
-                                <TableCell align="right">{container.Status}</TableCell>
-                                <TableCell align="right">{container.Names}</TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
->>>>>>> 628ae4f (added ip box to connect with remote docker daemon)
         </React.Fragment>
 )
 }
 
-export default Dashboard;
+export default Dashboard;v
