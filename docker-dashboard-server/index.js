@@ -1,10 +1,11 @@
 const express = require('express')
-const app = express();
-const expressWs = require('express-ws')(app);
+const expressApp = express();
+const expressWs = require('express-ws')(expressApp);
 const port = 3001;
 const path = require('path');
 const Docker = require('dockerode');
 var docker = new Docker({socketPath: '/var/run/docker.sock'});
+let { app } = expressWs;
 
 
 app.use(express.json());
@@ -52,7 +53,7 @@ app.get('/container/:id', (req, res, next) => {
     })
 });
 
-app.ws('/container/:id/logs', (ws, req) => {
+app.ws('/container/:id/logs', (ws, req, next) => {
     ws.on('message', (msg) => {
         console.log(msg);
         console.log('params id');
