@@ -4,15 +4,12 @@ import { w3cwebsocket as W3CWebSocket } from "websocket";
 import {Button} from "@material-ui/core";
 import {Terminal} from 'xterm';
 
-const client = new W3CWebSocket('ws://127.0.0.1:3001/container/4c5c87ff50f8/logs');
-
-
 function Container() {
     const [container, setContainer] = useState(null);
     const [logs, setLogs] = useState([]);
     const { id } = useParams();
     const term = new Terminal();
-
+    const client = new W3CWebSocket(`ws://127.0.0.1:3001/container/${id}/logs`);
     useEffect(() => {
         client.onopen= () => {
             console.log("WS opened");
@@ -35,8 +32,6 @@ function Container() {
         client.onmessage = (data) => {
             term.writeln(data.data)
         }
-
-
     }
 
     return(

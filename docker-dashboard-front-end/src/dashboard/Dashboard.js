@@ -7,6 +7,8 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import TextField from '@material-ui/core/TextField';
+import {Button} from "@material-ui/core";
 import {
     BrowserRouter as Router,
     Switch,
@@ -21,20 +23,54 @@ const useStyles = makeStyles({
 });
 
 function Dashboard() {
-  const [containers, setContainers] = useState([]);
-  const classes = useStyles();
-
-  useEffect(() => {
-    fetch("/containers")
+    const [containers, setContainers] = useState([]);
+    const [ip, setIp] = useState('');
+    const fetchContainer = () => {
+        fetch("/containers")
         .then(res => res.json())
         .then(
             (result) => {
+              console.log(result);
               setContainers(result)
             }
-        )
-  }, [])
+        ).catch( (reason) => {
+            console.log(reason);
+        })
+    }
+    const setip = () => {
+        fetch('/setip', {
+            method: 'POST',
+            headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+            body: JSON.stringify({host : ip})
+        }).then(
+            (result) => {
+                console.log(result);
+                fetchContainer();
+            }
+        ).catch((reason) => {
+            console.log(reason);
+        })
+    }
+
+    const classes = useStyles();
+    useEffect(() => {
+        fetchContainer();
+    }, [])
+    const handleChange = (event) => {
+        setIp(event.target.value);
+    };
 
     return (
+        <React.Fragment>
+            <TextField id="standard-basic" label="enter ip address" onChange={handleChange} />
+            <Button
+                onClick={setip}
+                variant={'outlined'}>
+                Connect
+            </Button>
             <TableContainer component={Paper}>
                 <Table className={classes.table}>
                     <TableHead>
@@ -65,6 +101,7 @@ function Dashboard() {
                     </TableBody>
                 </Table>
             </TableContainer>
+        </React.Fragment>
 )
 }
 
