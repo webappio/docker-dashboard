@@ -2,38 +2,35 @@ const express = require('express')
 const expressApp = express();
 const expressWs = require('express-ws')(expressApp);
 const port = 3001;
-<<<<<<< HEAD
 const path = require('path');
 const Docker = require('dockerode');
-var docker = new Docker({socketPath: '/var/run/docker.sock'});
 let { app } = expressWs;
 
-
 app.use(express.json());
+
+process.on('uncaughtException', err => {
+    // for some reason if docker does not connect it will throw an exception that cannot be caught
+    console.error(err, 'Uncaught Exception thrown');
+});
+
+var setdocker = async function (req, res, next) {
+    //var docker = new Docker({ protocol: 'ssh', host: `${req.params.jobuuid}.lan`, password: 'password', username: 'root'});
+    var docker = new Docker();
+    //ping docker to see if connection is working
+    try {
+        await docker.ping();
+        req.docker = docker;
+        next()
+    } catch (err) {
+        res.send(err)
+    }
+}
+
 app.use(express.static(path.join(__dirname, '..', 'docker-dashboard-front-end', 'build')));
-app.get('/', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'docker-dashboard-front-end', 'build', 'index.html'));
-});
-
-app.post('/setip', (req, res, next) => {
-    console.log(req.body);
-    docker = new Docker({ protocol: 'ssh', host : req.body.host, password: 'password', username: 'root'});
-=======
-const Docker = require('dockerode');
-var docker = new Docker({socketPath: '/var/run/docker.sock'});
-app.use(express.json());
-
-
-app.post('/setip', (req, res, next) => {
-    console.log(req.body);
-    docker = new Docker({ host : req.body.host, port : 2375})
->>>>>>> 628ae4f (added ip box to connect with remote docker daemon)
-    // try to add get all container
-    docker.listContainers({all: true}, (err, containers) => {
+app.get('/:jobuuid/containers', setdocker, (req, res, next) => {
+    req.docker.listContainers({all: true}, (err, containers) => {
         if (err) {
-            // reset to default
-            docker = new Docker({socketPath: '/var/run/docker.sock'});
-            console.log(err);
+            console.error(err);
             next(err);
         } else {
             res.send(containers);
@@ -41,22 +38,10 @@ app.post('/setip', (req, res, next) => {
     })
 });
 
-
-app.get('/containers', (req, res, next) => {
-    docker.listContainers({all: true}, (err, containers) => {
+app.get('/:jobuuid/container/:id', setdocker, (req, res, next) => {
+    req.docker.getContainer(req.params.id).inspect((err, container) => {
         if (err) {
-            console.log(err);
-            next(err);
-        } else {
-            res.send(containers);
-        }
-    })
-});
-
-app.get('/container/:id', (req, res, next) => {
-    docker.getContainer(req.params.id).inspect((err, container) => {
-        if (err) {
-            console.log(err);
+            console.error(err);
             next(err);
         } else {
             res.send(container);
@@ -64,36 +49,39 @@ app.get('/container/:id', (req, res, next) => {
     })
 });
 
-app.ws('/container/:id/logs', (ws, req) => {
-    ws.on('message', (msg) => {
-<<<<<<< HEAD
-=======
-        console.log(msg);
-        console.log('params id');
-        console.log(req.params.id);
->>>>>>> 628ae4f (added ip box to connect with remote docker daemon)
-        let logOpts = {
-            stdout: true,
-            stderr: true,
-            follow: true
-        };
-        docker.getContainer(req.params.id).logs(logOpts, (err, logs) => {
-            if (err) {
-                console.log(err);
-<<<<<<< HEAD
-=======
-                //next(err);
->>>>>>> 628ae4f (added ip box to connect with remote docker daemon)
-            } else {
-                logs.on('data', chunk => {
-                        let encodedLogs = Buffer.from(chunk, 'utf-8').toString();
-                        ws.send(encodedLogs);
-                })
-            }
-        })
+app.ws('/:jobuuid/container/:id/logs', setdocker, async (ws, req) => {
+    const container = ws.docker.getContainer(req.params.id)
+    if(!container) {
+        ws.send('Could not find container ' + containerName + '. Abort.');
+    }
+    container.logs({
+        follow: true,
+        stdout: true,
+        stderr: true
+    }, (err, logs) => {
+        if (err) {
+            ws.send("websocket errors encountered");
+            console.error(err);
+        } else {
+            ws.send("websocket connection established");
+            logs.on('data', chunk => {
+                let encodedLogs = Buffer.from(chunk, 'utf-8').toString();
+                ws.send(encodedLogs);
+            })
+        }
     })
-
 });
+
+app.get('*', function(req, res) {
+    res.sendFile('index.html', {root: path.join(__dirname, '..', 'docker-dashboard-front-end', 'build')});
+});
+
+app.use(function (err, req, res, next) {
+    console.error(err.stack)
+    res.status(500).send({
+        err : err.stack
+    })
+})
 
 app.listen(port, () => {
     console.log(`Docker plugin dashboard listening on http://localhost:${port}`)
