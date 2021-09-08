@@ -2,10 +2,16 @@ const express = require('express')
 const app = express();
 const expressWs = require('express-ws')(app);
 const port = 3001;
+const path = require('path');
 const Docker = require('dockerode');
 var docker = new Docker({socketPath: '/var/run/docker.sock'});
-app.use(express.json());
 
+
+app.use(express.json());
+app.use(express.static(path.join(__dirname, '..', 'docker-dashboard-front-end', 'build')));
+app.get('/', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'docker-dashboard-front-end', 'build', 'index.html'));
+});
 
 app.post('/setip', (req, res, next) => {
     console.log(req.body);
@@ -62,12 +68,10 @@ app.ws('/container/:id/logs', (ws, req) => {
                 console.log(err);
                 //next(err);
             } else {
-                logs.on('data', chunk =>{
-                    let encodedLogs = Buffer.from(chunk, 'utf-8').toString();
-                    ws.send(encodedLogs);
-                }
-                )
-
+                logs.on('data', chunk => {
+                        let encodedLogs = Buffer.from(chunk, 'utf-8').toString();
+                        ws.send(encodedLogs);
+                })
             }
         })
     })
@@ -75,5 +79,5 @@ app.ws('/container/:id/logs', (ws, req) => {
 });
 
 app.listen(port, () => {
-    console.log(`Docker plugin dashboard listening on port ${port}!`)
+    console.log(`Docker plugin dashboard listening on http://localhost:${port}`)
 });
