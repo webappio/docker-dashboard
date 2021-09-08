@@ -184,7 +184,6 @@ function Dashboard() {
                                 <TableCell align="right">{container.Command}</TableCell>
                                 <TableCell align="right">{container.Created}</TableCell>
                                 <TableCell align="right">{container.Status}</TableCell>
-                                <TableCell align="right">{container.Ports}</TableCell>
                                 <TableCell align="right">{container.Names}</TableCell>
                             </TableRow>
                         ))}
