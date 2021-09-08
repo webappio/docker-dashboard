@@ -2,6 +2,7 @@ const express = require('express')
 const expressApp = express();
 const expressWs = require('express-ws')(expressApp);
 const port = 3001;
+<<<<<<< HEAD
 const path = require('path');
 const Docker = require('dockerode');
 var docker = new Docker({socketPath: '/var/run/docker.sock'});
@@ -17,6 +18,16 @@ app.get('/', function (req, res) {
 app.post('/setip', (req, res, next) => {
     console.log(req.body);
     docker = new Docker({ protocol: 'ssh', host : req.body.host, password: 'password', username: 'root'});
+=======
+const Docker = require('dockerode');
+var docker = new Docker({socketPath: '/var/run/docker.sock'});
+app.use(express.json());
+
+
+app.post('/setip', (req, res, next) => {
+    console.log(req.body);
+    docker = new Docker({ host : req.body.host, port : 2375})
+>>>>>>> 628ae4f (added ip box to connect with remote docker daemon)
     // try to add get all container
     docker.listContainers({all: true}, (err, containers) => {
         if (err) {
@@ -55,6 +66,12 @@ app.get('/container/:id', (req, res, next) => {
 
 app.ws('/container/:id/logs', (ws, req) => {
     ws.on('message', (msg) => {
+<<<<<<< HEAD
+=======
+        console.log(msg);
+        console.log('params id');
+        console.log(req.params.id);
+>>>>>>> 628ae4f (added ip box to connect with remote docker daemon)
         let logOpts = {
             stdout: true,
             stderr: true,
@@ -63,6 +80,10 @@ app.ws('/container/:id/logs', (ws, req) => {
         docker.getContainer(req.params.id).logs(logOpts, (err, logs) => {
             if (err) {
                 console.log(err);
+<<<<<<< HEAD
+=======
+                //next(err);
+>>>>>>> 628ae4f (added ip box to connect with remote docker daemon)
             } else {
                 logs.on('data', chunk => {
                         let encodedLogs = Buffer.from(chunk, 'utf-8').toString();
