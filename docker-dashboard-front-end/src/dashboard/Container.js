@@ -8,7 +8,7 @@ function Container() {
     const { id } = useParams();
     const term = new Terminal();
     var protocol = window.location.protocol.replace('http', 'ws');
-    var hostname = window.location.hostname == 'localhost' ? 'localhost:3001' : window.location.hostname;
+    var hostname = window.location.hostname === 'localhost' ? 'localhost:3001' : window.location.hostname;
     const client = new W3CWebSocket(`${protocol}//${hostname}/container/${id}/logs`);
     
     useEffect(() => {
