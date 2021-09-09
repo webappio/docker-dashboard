@@ -12,9 +12,20 @@ function Container() {
     const [connect, setConnect] = useState(false);
     const { jobuuid, id } = useParams();
     const term = new Terminal();
+<<<<<<< HEAD
     const protocol = window.location.protocol.replace('http', 'ws');
     const hostname = window.location.hostname === 'localhost' ? 'localhost:3001' : window.location.hostname;
     const client = new W3CWebSocket(`${protocol}//${hostname}/${jobuuid}/container/${id}/logs`);
+=======
+    const client = new W3CWebSocket(`${location.hostname.replace('http', 'ws')}/container/${id}/logs`);
+    
+    useEffect(() => {
+        client.onopen= () => {
+            console.log("WS opened");
+        };
+        // eslint-disable-next-line
+    }, [])
+>>>>>>> f47f487 (fix websocket issue)
 
     const streamLogs = () => {
         term.open(document.getElementById('terminal'));
