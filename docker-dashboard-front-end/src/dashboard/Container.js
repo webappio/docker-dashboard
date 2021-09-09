@@ -7,7 +7,7 @@ import {Terminal} from 'xterm';
 function Container() {
     const { id } = useParams();
     const term = new Terminal();
-    const client = new W3CWebSocket(`ws://127.0.0.1:3001/container/${id}/logs`);
+    const client = new W3CWebSocket(`${location.hostname.replace('http', 'ws')}/container/${id}/logs`);
     
     useEffect(() => {
         client.onopen= () => {
