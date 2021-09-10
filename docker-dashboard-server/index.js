@@ -16,7 +16,7 @@ app.get('/', function (req, res) {
 
 app.post('/setip', (req, res, next) => {
     console.log(req.body);
-    docker = new Docker({ host : req.body.host, port : 2375})
+    docker = new Docker({ protocol: 'ssh', host : req.body.host, password: 'password', username: 'root'});
     // try to add get all container
     docker.listContainers({all: true}, (err, containers) => {
         if (err) {
