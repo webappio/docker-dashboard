@@ -12,10 +12,16 @@ function Container() {
     const [connect, setConnect] = useState(false);
     const { jobuuid, id } = useParams();
     const term = new Terminal();
+<<<<<<< HEAD
     const protocol = window.location.protocol.replace('http', 'ws');
     const hostname = window.location.hostname === 'localhost' ? 'localhost:3001' : window.location.hostname;
     const client = new W3CWebSocket(`${protocol}//${hostname}/${jobuuid}/container/${id}/logs`);
 
+=======
+    var protocol = window.location.protocol.replace('http', 'ws');
+    var hostname = window.location.hostname === 'localhost' ? 'localhost:3001' : window.location.hostname;
+    const client = new W3CWebSocket(`${protocol}//${hostname}/container/${id}/logs`);
+>>>>>>> 687076e (remove unnecessary lines)
     const streamLogs = () => {
         term.open(document.getElementById('terminal'));
         client.onopen = () => client.send('logs');

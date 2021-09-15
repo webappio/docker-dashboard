@@ -13,7 +13,6 @@ process.on('uncaughtException', err => {
     console.error(err, 'Uncaught Exception thrown');
 });
 
-<<<<<<< HEAD
 var setdocker = async function (req, res, next) {
     //var docker = new Docker({ protocol: 'ssh', host: `${req.params.jobuuid}.lan`, password: 'password', username: 'root'});
     var docker = new Docker();
@@ -30,13 +29,6 @@ var setdocker = async function (req, res, next) {
 app.use(express.static(path.join(__dirname, '..', 'docker-dashboard-front-end', 'build')));
 app.get('/:jobuuid/containers', setdocker, (req, res, next) => {
     req.docker.listContainers({all: true}, (err, containers) => {
-=======
-app.post('/setip', (req, res, next) => {
-    console.log(req.body);
-    docker = new Docker({ protocol: 'ssh', host : req.body.host, password: 'password', username: 'root'});
-    // try to add get all container
-    docker.listContainers({all: true}, (err, containers) => {
->>>>>>> 779f57e (im dumb)
         if (err) {
             console.error(err);
             next(err);
