@@ -10,13 +10,6 @@ function Container() {
     var protocol = window.location.protocol.replace('http', 'ws');
     var hostname = window.location.hostname === 'localhost' ? 'localhost:3001' : window.location.hostname;
     const client = new W3CWebSocket(`${protocol}//${hostname}/container/${id}/logs`);
-    useEffect(() => {
-        client.onopen= () => {
-            console.log("WS opened");
-        };
-        // eslint-disable-next-line
-    }, [])
-
     const streamLogs = () => {
         term.open(document.getElementById('terminal'));
         client.send("logs");

@@ -53,7 +53,7 @@ app.get('/container/:id', (req, res, next) => {
     })
 });
 
-app.ws('/container/:id/logs', (ws, req, next) => {
+app.ws('/container/:id/logs', (ws, req) => {
     ws.on('message', (msg) => {
         console.log(msg);
         console.log('params id');
@@ -67,7 +67,6 @@ app.ws('/container/:id/logs', (ws, req, next) => {
         docker.getContainer(req.params.id).logs(logOpts, (err, logs) => {
             if (err) {
                 console.log(err);
-                //next(err);
             } else {
                 logs.on('data', chunk => {
                         let encodedLogs = Buffer.from(chunk, 'utf-8').toString();
