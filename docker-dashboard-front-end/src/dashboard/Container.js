@@ -5,8 +5,11 @@ import {Button, Grid} from "@material-ui/core";
 import {Terminal} from 'xterm';
 import 'xterm/css/xterm.css'
 import Box from "@material-ui/core/Box";
+<<<<<<< HEAD
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import IconButton from '@material-ui/core/IconButton';
+=======
+>>>>>>> 56c3577 (lint)
 
 function Container() {
     const [connect, setConnect] = useState(false);
@@ -26,10 +29,15 @@ function Container() {
             console.error(error)
         }
     }
+<<<<<<< HEAD
 
     //eslint-disable-next-line
     useEffect(() => connect ? streamLogs() : null, [connect]);
 
+=======
+    //eslint-disable-next-line
+    useEffect(() => connect ? streamLogs() : null, [connect])
+>>>>>>> 56c3577 (lint)
     return(
         <div>
             <IconButton>
