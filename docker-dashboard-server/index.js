@@ -55,15 +55,11 @@ app.get('/container/:id', (req, res, next) => {
 
 app.ws('/container/:id/logs', (ws, req) => {
     ws.on('message', (msg) => {
-        console.log(msg);
-        console.log('params id');
-        console.log(req.params.id);
         let logOpts = {
             stdout: true,
             stderr: true,
             follow: true
         };
-
         docker.getContainer(req.params.id).logs(logOpts, (err, logs) => {
             if (err) {
                 console.log(err);
