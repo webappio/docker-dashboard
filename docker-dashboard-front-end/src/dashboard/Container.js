@@ -1,54 +1,41 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useParams} from "react-router";
 import { w3cwebsocket as W3CWebSocket } from "websocket";
-import {Button} from "@material-ui/core";
+import {Button, Grid} from "@material-ui/core";
 import {Terminal} from 'xterm';
-
-const client = new W3CWebSocket('ws://127.0.0.1:3001/container/4c5c87ff50f8/logs');
-
+import 'xterm/css/xterm.css'
+import Box from "@material-ui/core/Box";
 
 function Container() {
-    const [container, setContainer] = useState(null);
-    const [logs, setLogs] = useState([]);
+    const [connect, setConnect] = useState(false);
     const { id } = useParams();
     const term = new Terminal();
-
-    useEffect(() => {
-        client.onopen= () => {
-            console.log("WS opened");
-        };
-
-        fetch("/container/" + id)
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    setContainer(result)
-                }
-            )
-
-    }, [])
-
+    var protocol = window.location.protocol.replace('http', 'ws');
+    var hostname = window.location.hostname === 'localhost' ? 'localhost:3001' : window.location.hostname;
+    var client;
     const streamLogs = () => {
-
         term.open(document.getElementById('terminal'));
-        client.send("logs");
+        client = new W3CWebSocket(`${protocol}//${hostname}/container/${id}/logs`);
+        client.onopen = () => client.send('logs');
         client.onmessage = (data) => {
             term.writeln(data.data)
         }
-
-
     }
-
+    //eslint-disable-next-line
+    useEffect(() => connect ? streamLogs() : null, [connect])
     return(
         <div>
             <h1>{id}</h1>
             <Button
-                onClick={streamLogs}
+                onClick={() => setConnect(!connect)}
                 variant={'outlined'}>
-                Connect to logs
+                {connect ? 'Close logs' : 'Connect to logs'}
             </Button>
-            <div id="terminal"/>
-            {logs}
+            <Grid container justifyContent="center">
+                <Box m={3}>
+                    {connect ? <div id="terminal"/> : null}
+                </Box>
+            </Grid>
         </div>
     );
 }
