@@ -6,9 +6,6 @@ import {Terminal} from 'xterm';
 import 'xterm/css/xterm.css'
 import Box from "@material-ui/core/Box";
 
-
-
-
 function Container() {
     const [connect, setConnect] = useState(false);
     const { id } = useParams();
@@ -24,8 +21,8 @@ function Container() {
             term.writeln(data.data)
         }
     }
+    //eslint-disable-next-line
     useEffect(() => connect ? streamLogs() : null, [connect])
-
     return(
         <div>
             <h1>{id}</h1>
