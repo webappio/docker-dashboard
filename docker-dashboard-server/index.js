@@ -4,7 +4,9 @@ const expressWs = require('express-ws')(expressApp);
 const port = 3001;
 const path = require('path');
 const Docker = require('dockerode');
+
 var docker = new Docker({socketPath: '/var/run/docker.sock'});
+
 let { app } = expressWs;
 
 
@@ -13,6 +15,10 @@ app.use(express.static(path.join(__dirname, '..', 'docker-dashboard-front-end', 
 app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'docker-dashboard-front-end', 'build', 'index.html'));
 });
+
+app.get('/test', function(req, res) {
+    res.send({ test : "test end point"})
+})
 
 app.post('/setip', (req, res, next) => {
     console.log(req.body);
@@ -29,7 +35,6 @@ app.post('/setip', (req, res, next) => {
         }
     })
 });
-
 
 app.get('/containers', (req, res, next) => {
     docker.listContainers({all: true}, (err, containers) => {

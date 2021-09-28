@@ -29,9 +29,14 @@ function Dashboard() {
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
     const fetchContainer = () => {
         fetch("/containers")
-        .then(res => res.json())
+        .then(res => {
+            console.log(res);
+            return res.json()
+        })
         .then(
             (result) => {
+              console.log('containers');
+              console.log(result);
               setContainers(result)
             }
         ).catch((reason) => {
@@ -55,6 +60,21 @@ function Dashboard() {
             console.log(reason);
         })
     }
+    const test = () => {
+        fetch('/test', {
+            method: 'GET'
+        })
+        .then(res => res.json())
+        .then(
+            (result) => {
+                console.log('test')
+                console.log(result)
+            }
+        ).catch((reason) => {
+            console.log('error')
+            console.log(reason)
+        })
+    }
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
@@ -65,6 +85,7 @@ function Dashboard() {
     const classes = useStyles();
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, containers.length - page * rowsPerPage);
     useEffect(() => {
+        test();
         fetchContainer();
     }, [])
     const handleChange = (event) => {
