@@ -72,7 +72,6 @@ app.ws('/:jobuuid/container/:id/logs', setdocker, async (ws, req) => {
     })
 });
 
-<<<<<<< HEAD
 app.get('*', function(req, res) {
     res.sendFile('index.html', {root: path.join(__dirname, '..', 'docker-dashboard-front-end', 'build')});
 });
@@ -81,25 +80,6 @@ app.use(function (err, req, res, next) {
     console.error(err.stack)
     res.status(500).send({
         err : err.stack
-=======
-app.ws('/container/:id/logs', (ws, req) => {
-    ws.on('message', (msg) => {
-        let logOpts = {
-            stdout: true,
-            stderr: true,
-            follow: true
-        };
-        docker.getContainer(req.params.id).logs(logOpts, (err, logs) => {
-            if (err) {
-                console.log(err);
-            } else {
-                logs.on('data', chunk => {
-                        let encodedLogs = Buffer.from(chunk, 'utf-8').toString();
-                        ws.send(encodedLogs);
-                })
-            }
-        })
->>>>>>> 3fd4773 (added styling pagination and connect and disconnect button)
     })
 })
 
