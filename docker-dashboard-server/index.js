@@ -73,7 +73,11 @@ app.ws('/:jobuuid/container/:id/logs', setdocker, async (ws, req) => {
 =======
 app.ws('/container/:uuid/:id/logs', async (ws, req) => {
     var docker = new Docker({ protocol: 'ssh', host: `${req.params.uuid}.lan`, password: 'password', username: 'root'});
-    await docker.ping()
+    try {
+        await docker.ping()
+    } catch (err) {
+        res.send(err)
+    }
     ws.on('message', (msg) => {
         let logOpts = {
             stdout: true,
