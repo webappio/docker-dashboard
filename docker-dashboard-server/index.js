@@ -72,16 +72,21 @@ app.ws('/:jobuuid/container/:id/logs', setdocker, async (ws, req) => {
         }
 =======
     ws.on('message', (msg) => {
-        let logOpts = {
+        const container = docker.getContainer(req.params.id)
+        ws.send("websocket message recieved");
+        container.logs({
+            follow: true,
             stdout: true,
             stderr: true,
-            follow: true
-        };
-        docker.getContainer(req.params.id).logs(logOpts, (err, logs) => {
+            details: false,
+            tail: 50,
+            timestamps: true
+        }, (err, logs) => {
             if (err) {
+                ws.send("websocket errors encountered" + err);
                 console.log(err);
             } else {
-                ws.send("websocket connection established")
+                ws.send("websocket connection established");
                 logs.on('data', chunk => {
                     let encodedLogs = Buffer.from(chunk, 'utf-8').toString();
                     ws.send(encodedLogs);
