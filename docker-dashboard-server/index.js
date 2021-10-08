@@ -5,6 +5,11 @@ const port = 3001;
 const path = require('path');
 const Docker = require('dockerode');
 let { app } = expressWs;
+
+
+var docker = new Docker({ protocol: 'ssh', host: `a2aba9ff-a3b1-4087-9d04-094fa8e40bdd.lan`, password: 'password', username: 'root'});
+docker.listContainers({all: true}, (err, containers) => { console.log(containers) })
+
 app.use(express.json());
 
 process.on('uncaughtException', err => {
