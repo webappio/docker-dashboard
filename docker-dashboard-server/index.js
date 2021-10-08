@@ -6,10 +6,6 @@ const path = require('path');
 const Docker = require('dockerode');
 let { app } = expressWs;
 
-
-var docker = new Docker({ protocol: 'ssh', host: `a2aba9ff-a3b1-4087-9d04-094fa8e40bdd.lan`, password: 'password', username: 'root'});
-docker.listContainers({all: true}, (err, containers) => { console.log(containers) })
-
 app.use(express.json());
 
 process.on('uncaughtException', err => {
@@ -22,7 +18,11 @@ var setdocker = async function (req, res, next) {
     var docker = new Docker();
     //ping docker to see if connection is working
     try {
+<<<<<<< HEAD
         await docker.ping();
+=======
+        await docker.ping()
+>>>>>>> d6177c6 (docker)
         req.docker = docker;
         next()
     } catch (err) {
@@ -42,7 +42,11 @@ app.get('/:jobuuid/containers', setdocker, (req, res, next) => {
     })
 });
 
+<<<<<<< HEAD
 app.get('/:jobuuid/container/:id', setdocker, (req, res, next) => {
+=======
+app.get('/container/:uuid/:id', setdocker, (req, res, next) => {
+>>>>>>> d6177c6 (docker)
     req.docker.getContainer(req.params.id).inspect((err, container) => {
         if (err) {
             console.error(err);
