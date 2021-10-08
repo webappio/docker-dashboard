@@ -14,14 +14,8 @@ process.on('uncaughtException', err => {
 });
 
 var setdocker = async function (req, res, next) {
-<<<<<<< HEAD
     //var docker = new Docker({ protocol: 'ssh', host: `${req.params.jobuuid}.lan`, password: 'password', username: 'root'});
     var docker = new Docker();
-=======
-    var docker = new Docker({socketPath: '/var/run/docker.sock'});
-    //var docker = new Docker({ protocol: 'ssh', host: `${req.params.uuid}.lan`, password: 'password', username: 'root'});
-    console.log('recieve uuid', req.params.uuid);
->>>>>>> 703f2f5 (added a back button)
     //ping docker to see if connection is working
     try {
         await docker.ping();
@@ -55,7 +49,6 @@ app.get('/:jobuuid/container/:id', setdocker, (req, res, next) => {
     })
 });
 
-<<<<<<< HEAD
 app.ws('/:jobuuid/container/:id/logs', setdocker, async (ws, req) => {
     const container = ws.docker.getContainer(req.params.id)
     if(!container) {
@@ -76,33 +69,6 @@ app.ws('/:jobuuid/container/:id/logs', setdocker, async (ws, req) => {
                 ws.send(encodedLogs);
             })
         }
-=======
-app.ws('/container/:uuid/:id/logs', async (ws, req) => {
-    console.log("websocket connection")
-    var docker = new Docker({ protocol: 'ssh', host: `${req.params.uuid}.lan`, password: 'password', username: 'root'});
-    try {
-        var res = await docker.ping();
-    } catch (err) {
-        console.log(err);
-        res.send(err)
-    }
-    ws.on('message', (msg) => {
-        let logOpts = {
-            stdout: true,
-            stderr: true,
-            follow: true
-        };
-        docker.getContainer(req.params.id).logs(logOpts, (err, logs) => {
-            if (err) {
-                console.log(err);
-            } else {
-                logs.on('data', chunk => {
-                    let encodedLogs = Buffer.from(chunk, 'utf-8').toString();
-                    ws.send(encodedLogs);
-                })
-            }
-        })
->>>>>>> 3cead3a (empty)
     })
 });
 

@@ -49,7 +49,6 @@ function Dashboard() {
     useEffect(() => fetchContainer(), [])
 =======
     useEffect(() => {
-        test();
         fetchContainer();
     // eslint-disable-next-line
     }, [])
