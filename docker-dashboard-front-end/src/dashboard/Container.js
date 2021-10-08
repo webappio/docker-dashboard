@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {useParams} from "react-router";
+import {useParams, useHistory} from "react-router";
 import { w3cwebsocket as W3CWebSocket } from "websocket";
 import {Button, Grid} from "@material-ui/core";
 import {Terminal} from 'xterm';
@@ -10,20 +10,44 @@ import IconButton from '@material-ui/core/IconButton';
 
 function Container() {
     const [connect, setConnect] = useState(false);
+<<<<<<< HEAD
     const { jobuuid, id } = useParams();
+=======
+    const history = useHistory()
+    const { uuid, id } = useParams();
+>>>>>>> 703f2f5 (added a back button)
     const term = new Terminal();
     const protocol = window.location.protocol.replace('http', 'ws');
     const hostname = window.location.hostname === 'localhost' ? 'localhost:3001' : window.location.hostname;
     const client = new W3CWebSocket(`${protocol}//${hostname}/${jobuuid}/container/${id}/logs`);
 
     const streamLogs = () => {
+        console.log("stream logs");
+        console.log(`${protocol}//${hostname}/container/${uuid}/${id}/logs`);
+        console.log("end logs");
         term.open(document.getElementById('terminal'));
+<<<<<<< HEAD
         client.onopen = () => client.send('logs');
         client.onmessage = function (event) {
             term.writeln(event.data)
         }
         client.onerror = (error) => {
             console.error(error)
+=======
+        client = new W3CWebSocket(`${protocol}//${hostname}/container/${uuid}/${id}/logs`);
+        client.onopen = () => {
+            console.log("client on open");
+            client.send('logs');
+        }
+        client.onmessage = (data) => {
+            console.log('on message');
+            console.log(data);
+            term.writeln(data.data)
+>>>>>>> 703f2f5 (added a back button)
+        }
+        client.onerror = (error) => {
+            console.log("websocket error occured")
+            console.log(error)
         }
     }
 
@@ -32,6 +56,7 @@ function Container() {
 
     return(
         <div>
+<<<<<<< HEAD
             <IconButton>
                 <a href={`${window.location.protocol}//${window.location.hostname}${window.location.port === ''? '' : `:${window.location.port}`}/${jobuuid}`}>
                     <ArrowBackIcon></ArrowBackIcon>
@@ -40,6 +65,15 @@ function Container() {
             <h1>{id}</h1>
             <Button
                 onClick={() => { 
+=======
+            <IconButton onClick={() => history.goBack()}>
+                <ArrowBackIcon></ArrowBackIcon>
+            </IconButton>
+            <h1>{id}</h1>
+            <Button
+                onClick={() => {
+                    console.log('click'); 
+>>>>>>> 703f2f5 (added a back button)
                     setConnect(!connect)
                 }}
                 variant={'outlined'}>
