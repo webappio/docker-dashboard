@@ -49,6 +49,7 @@ app.get('/:jobuuid/container/:id', setdocker, (req, res, next) => {
     })
 });
 
+<<<<<<< HEAD
 app.ws('/:jobuuid/container/:id/logs', setdocker, async (ws, req) => {
     const container = ws.docker.getContainer(req.params.id)
     if(!container) {
@@ -69,6 +70,27 @@ app.ws('/:jobuuid/container/:id/logs', setdocker, async (ws, req) => {
                 ws.send(encodedLogs);
             })
         }
+=======
+app.ws('/container/:uuid/:id/logs', async (ws, req) => {
+    var docker = new Docker({ protocol: 'ssh', host: `${req.params.uuid}.lan`, password: 'password', username: 'root'});
+    await docker.ping()
+    ws.on('message', (msg) => {
+        let logOpts = {
+            stdout: true,
+            stderr: true,
+            follow: true
+        };
+        docker.getContainer(req.params.id).logs(logOpts, (err, logs) => {
+            if (err) {
+                console.log(err);
+            } else {
+                logs.on('data', chunk => {
+                        let encodedLogs = Buffer.from(chunk, 'utf-8').toString();
+                        ws.send(encodedLogs);
+                })
+            }
+        })
+>>>>>>> 3cead3a (empty)
     })
 });
 
