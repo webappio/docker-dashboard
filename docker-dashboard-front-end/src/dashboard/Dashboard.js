@@ -43,9 +43,17 @@ function Dashboard() {
         setPage(0);
     };
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, containers.length - page * rowsPerPage);
+<<<<<<< HEAD
     
     // eslint-disable-next-line
     useEffect(() => fetchContainer(), [])
+=======
+    useEffect(() => {
+        test();
+        fetchContainer();
+    // eslint-disable-next-line
+    }, [])
+>>>>>>> d807dd6 (lint)
 
     return (
         <React.Fragment>
