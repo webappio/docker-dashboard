@@ -9,17 +9,34 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import IconButton from '@material-ui/core/IconButton';
 
 function Container() {
+    const controller = new AbortController()
     const [connect, setConnect] = useState(false);
     const { jobuuid, id } = useParams();
     const term = new Terminal();
+<<<<<<< HEAD
     const protocol = window.location.protocol.replace('http', 'ws');
     const hostname = window.location.hostname === 'localhost' ? 'localhost:3001' : window.location.hostname;
     const client = new W3CWebSocket(`${protocol}//${hostname}/${jobuuid}/container/${id}/logs`);
 
+=======
+    var protocol = window.location.protocol.replace('http', 'ws');
+    var hostname = window.location.hostname === 'localhost' ? 'localhost:3001' : window.location.hostname;
+    var client;
+    const fetchContainerDetails = async () => {
+        try {
+            console.log('fetch containers details');
+            const res = await fetch(`/container/${uuid}/${id}`, {
+                signal : controller.signal
+            })
+            const result = await res.json()
+            console.log(result)
+        } catch (reason) {
+            console.log(reason)
+        }
+    }
+>>>>>>> 500c1e6 (ws test)
     const streamLogs = () => {
-        console.log("stream logs");
         console.log(`${protocol}//${hostname}/container/${uuid}/${id}/logs`);
-        console.log("end logs");
         term.open(document.getElementById('terminal'));
         client.onopen = () => client.send('logs');
         client.onmessage = function (event) {
@@ -35,8 +52,14 @@ function Container() {
     }
 
     //eslint-disable-next-line
+<<<<<<< HEAD
     useEffect(() => connect ? streamLogs() : null, [connect]);
 
+=======
+    useEffect(() => fetchContainerDetails(), []);
+    //eslint-disable-next-line
+    useEffect(() => connect ? streamLogs() : null, [connect]);
+>>>>>>> 500c1e6 (ws test)
     return(
         <div>
             <IconButton>

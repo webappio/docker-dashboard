@@ -14,8 +14,13 @@ process.on('uncaughtException', err => {
 });
 
 var setdocker = async function (req, res, next) {
+<<<<<<< HEAD
     //var docker = new Docker({ protocol: 'ssh', host: `${req.params.jobuuid}.lan`, password: 'password', username: 'root'});
     var docker = new Docker();
+=======
+    var docker = new Docker({ protocol: 'ssh', host: `${req.params.uuid}.lan`, password: 'password', username: 'root'});
+    //var docker = new Docker({socketPath: '/var/run/docker.sock'});
+>>>>>>> 500c1e6 (ws test)
     //ping docker to see if connection is working
     try {
         await docker.ping();
@@ -49,10 +54,21 @@ app.get('/:jobuuid/container/:id', setdocker, (req, res, next) => {
     })
 });
 
+<<<<<<< HEAD
 app.ws('/:jobuuid/container/:id/logs', setdocker, async (ws, req) => {
     const container = ws.docker.getContainer(req.params.id)
     if(!container) {
         ws.send('Could not find container ' + containerName + '. Abort.');
+=======
+//ws://1502de53-6a43-4e4d-be22-fbabb53a7fce.cidemolocal.co/container/82c642ca-ace7-4fbc-bf49-f14a2882d8cc/8d128e4c811ab33a3b96f28f7c934a8173ae69266de96f24df352347f85e8188/logs
+app.ws('/container/:uuid/:id/logs', async (ws, req) => {
+    var docker = new Docker({ protocol: 'ssh', host: `${req.params.uuid}.lan`, password: 'password', username: 'root'});
+    //var docker = new Docker({socketPath: '/var/run/docker.sock'});
+    try {
+        await docker.ping();
+    } catch (err) {
+        console.log(err);
+>>>>>>> 500c1e6 (ws test)
     }
 <<<<<<< HEAD
     container.logs({
@@ -71,12 +87,33 @@ app.ws('/:jobuuid/container/:id/logs', setdocker, async (ws, req) => {
             })
 =======
     ws.send("websocket connection recieved")
+<<<<<<< HEAD
     ws.on('message', (msg) => {
         console.log("recieve message");
         const container = docker.getContainer(req.params.id)
         if(!container) {
             ws.send('Could not find container ' + containerName + '. Abort.');
 >>>>>>> 8b5cc75 (add on connect msg)
+=======
+    const container = docker.getContainer(req.params.id)
+    if(!container) {
+        ws.send('Could not find container ' + containerName + '. Abort.');
+    }
+    container.logs({
+        follow: true,
+        stdout: true,
+        stderr: true
+    }, (err, logs) => {
+        if (err) {
+            ws.send("websocket errors encountered");
+            console.log(err);
+        } else {
+            ws.send("websocket connection established");
+            logs.on('data', chunk => {
+                let encodedLogs = Buffer.from(chunk, 'utf-8').toString();
+                ws.send(encodedLogs);
+            })
+>>>>>>> 500c1e6 (ws test)
         }
     })
 });
