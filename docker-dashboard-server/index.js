@@ -54,7 +54,6 @@ app.ws('/:jobuuid/container/:id/logs', setdocker, async (ws, req) => {
     if(!container) {
         ws.send('Could not find container ' + containerName + '. Abort.');
     }
-<<<<<<< HEAD
     container.logs({
         follow: true,
         stdout: true,
@@ -70,30 +69,6 @@ app.ws('/:jobuuid/container/:id/logs', setdocker, async (ws, req) => {
                 ws.send(encodedLogs);
             })
         }
-=======
-    ws.on('message', (msg) => {
-        const container = docker.getContainer(req.params.id)
-        ws.send("websocket message recieved");
-        container.logs({
-            follow: true,
-            stdout: true,
-            stderr: true,
-            details: false,
-            tail: 50,
-            timestamps: true
-        }, (err, logs) => {
-            if (err) {
-                ws.send("websocket errors encountered" + err);
-                console.log(err);
-            } else {
-                ws.send("websocket connection established");
-                logs.on('data', chunk => {
-                    let encodedLogs = Buffer.from(chunk, 'utf-8').toString();
-                    ws.send(encodedLogs);
-                })
-            }
-        })
->>>>>>> 8e5ed81 (add connection message)
     })
 });
 
