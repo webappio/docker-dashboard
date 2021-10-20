@@ -14,12 +14,8 @@ process.on('uncaughtException', err => {
 });
 
 var setdocker = async function (req, res, next) {
-<<<<<<< HEAD
     //var docker = new Docker({ protocol: 'ssh', host: `${req.params.jobuuid}.lan`, password: 'password', username: 'root'});
     var docker = new Docker();
-=======
-    var docker = new Docker({ protocol: 'ssh', host: `${req.params.jobuuid}.lan`, password: 'password', username: 'root'});
->>>>>>> 79bccdd (pr comments)
     //ping docker to see if connection is working
     try {
         await docker.ping();
@@ -53,20 +49,8 @@ app.get('/:jobuuid/container/:id', setdocker, (req, res, next) => {
     })
 });
 
-<<<<<<< HEAD
 app.ws('/:jobuuid/container/:id/logs', setdocker, async (ws, req) => {
     const container = ws.docker.getContainer(req.params.id)
-=======
-app.ws('/:jobuuid/container/:id/logs', async (ws, req) => {
-    var docker = new Docker({ protocol: 'ssh', host: `${req.params.jobuuid}.lan`, password: 'password', username: 'root'});
-    try {
-        await docker.ping();
-    } catch (err) {
-        console.log(err);
-    }
-    ws.send("websocket connection recieved")
-    const container = docker.getContainer(req.params.id)
->>>>>>> 79bccdd (pr comments)
     if(!container) {
         ws.send('Could not find container ' + containerName + '. Abort.');
     }
