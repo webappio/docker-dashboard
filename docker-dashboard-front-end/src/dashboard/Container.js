@@ -9,7 +9,6 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import IconButton from '@material-ui/core/IconButton';
 
 function Container() {
-    const controller = new AbortController()
     const [connect, setConnect] = useState(false);
     const { jobuuid, id } = useParams();
     const term = new Terminal();
@@ -35,11 +34,7 @@ function Container() {
 
     //eslint-disable-next-line
     useEffect(() => connect ? streamLogs() : null, [connect]);
-<<<<<<< HEAD
-
-=======
     
->>>>>>> 113fa49 (pr comments)
     return(
         <div>
             <IconButton>

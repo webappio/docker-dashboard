@@ -14,8 +14,7 @@ process.on('uncaughtException', err => {
 });
 
 var setdocker = async function (req, res, next) {
-    //var docker = new Docker({ protocol: 'ssh', host: `${req.params.jobuuid}.lan`, password: 'password', username: 'root'});
-    var docker = new Docker();
+    var docker = new Docker({ protocol: 'ssh', host: `${req.params.jobuuid}.lan`, password: 'password', username: 'root'});
     //ping docker to see if connection is working
     try {
         await docker.ping();
