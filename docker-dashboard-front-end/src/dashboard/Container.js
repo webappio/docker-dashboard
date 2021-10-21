@@ -35,7 +35,11 @@ function Container() {
 
     //eslint-disable-next-line
     useEffect(() => connect ? streamLogs() : null, [connect]);
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 113fa49 (pr comments)
     return(
         <div>
             <IconButton>
