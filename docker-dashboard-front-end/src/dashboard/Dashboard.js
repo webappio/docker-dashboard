@@ -16,20 +16,12 @@ function Dashboard() {
     const controller = new AbortController()
     // abort fetch after 5 seconds
     setTimeout(() => controller.abort(), 5000)
-<<<<<<< HEAD
     const [containers, setContainers] = useState([]);
     const [page, setPage] = useState(0);
     const [error, setError] = useState(false);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const { jobuuid } = useParams();
 
-=======
-    const [page, setPage] = React.useState(0);
-    const [error, setError] = React.useState(false);
-    const [rowsPerPage, setRowsPerPage] = React.useState(5);
-    let { jobuuid } = useParams();
-    console.log(jobuuid)
->>>>>>> df637f0 (pr comments)
     const fetchContainer = async () => {
         try {
             const res = await fetch(`/${jobuuid}/containers/`, {
