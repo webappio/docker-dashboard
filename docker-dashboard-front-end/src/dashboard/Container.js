@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {useParams, useHistory} from "react-router";
+import {useParams} from "react-router";
 import { w3cwebsocket as W3CWebSocket } from "websocket";
 import {Button, Grid} from "@material-ui/core";
 import {Terminal} from 'xterm';
