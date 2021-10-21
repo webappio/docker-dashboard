@@ -17,7 +17,6 @@ function Container() {
     const client = new W3CWebSocket(`${protocol}//${hostname}/${jobuuid}/container/${id}/logs`);
 
     const streamLogs = () => {
-        console.log(`${protocol}//${hostname}/container/${uuid}/${id}/logs`);
         term.open(document.getElementById('terminal'));
         client.onopen = () => client.send('logs');
         client.onmessage = function (event) {
@@ -26,15 +25,11 @@ function Container() {
         client.onerror = (error) => {
             console.error(error)
         }
-        client.onerror = (error) => {
-            console.log("websocket error occured")
-            console.log(error)
-        }
     }
-
+    
     //eslint-disable-next-line
     useEffect(() => connect ? streamLogs() : null, [connect]);
-    
+
     return(
         <div>
             <IconButton>
