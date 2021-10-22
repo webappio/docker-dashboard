@@ -43,17 +43,17 @@ function Dashboard() {
         setPage(0);
     };
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, containers.length - page * rowsPerPage);
-    
+
     // eslint-disable-next-line
     useEffect(() => fetchContainer(), [])
 
     return (
         <React.Fragment>
             <Box m={5}>
-                {error ? 
+                {error ?
                 <Typography>
                     Could not connect to docker error
-                </Typography> : 
+                </Typography> :
                 <TableContainer component={Paper}>
                     <Table>
                         <TableHead>
