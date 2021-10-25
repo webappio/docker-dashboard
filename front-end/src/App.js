@@ -13,10 +13,10 @@ function App() {
             <Route exact path="/">
                 <NotFound/>
             </Route>
-            <Route exact path="/:jobuuid">
+            <Route exact path="/:jobUuid">
                 <Dashboard/>
             </Route>
-            <Route exact path="/:jobuuid/container/:id">
+            <Route exact path="/:jobUuid/container/:id">
                 <Container/>
             </Route>
         </Switch>

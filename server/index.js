@@ -12,12 +12,6 @@ app.use(express.json());
 
 app.use(express.static(FRONT_END_PATH));
 
-process.on('uncaughtException', err => {
-    // for some reason if docker does not connect it will throw an exception that cannot be caught
-    console.error(err, 'Uncaught Exception thrown');
-});
-
-
 const setDocker = async function (req, res, next) {
     let docker = new Docker({ protocol: 'ssh', host: `${req.params.jobUuid}.lan`, password: 'password', username: 'root'});
     //ping docker to see if connection is working
@@ -26,7 +20,7 @@ const setDocker = async function (req, res, next) {
         req.docker = docker;
         next()
     } catch (err) {
-        res.send(err)
+        next(err)
     }
 }
 
