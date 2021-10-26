@@ -9,32 +9,30 @@ import TablePagination from '@material-ui/core/TablePagination';
 import Paper from '@material-ui/core/Paper';
 import {Link} from "react-router-dom";
 import Box from '@material-ui/core/Box';
-import {Typography} from '@material-ui/core';
 import {useParams} from "react-router-dom";
 
 function Dashboard() {
-    const controller = new AbortController()
-    // abort fetch after 5 seconds
-    setTimeout(() => controller.abort(), 5000)
     const [containers, setContainers] = useState([]);
     const [page, setPage] = useState(0);
     const [error, setError] = useState(false);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const { jobuuid } = useParams();
+    const { jobUuid } = useParams();
 
-    const fetchContainer = async () => {
-        try {
-            const res = await fetch(`/${jobuuid}/containers/`, {
-                signal : controller.signal
-            })
-            const result = await res.json()
-            setContainers(result)
-            setError(false)
-        } catch (reason) {
-            console.error(reason)
-            setError(true)
+    useEffect(() => {
+        async function fetchContainers() {
+            try {
+                const res = await fetch(`/${jobUuid}/containers/`)
+                const result = await res.json()
+                setContainers(result)
+                setError(false)
+            } catch (err) {
+                console.error(err)
+                setError(true)
+            }
         }
-    }
+        fetchContainers()
+    }, [jobUuid])
+
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
@@ -44,42 +42,42 @@ function Dashboard() {
     };
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, containers.length - page * rowsPerPage);
 
-    // eslint-disable-next-line
-    useEffect(() => fetchContainer(), [])
-
     return (
-        <React.Fragment>
-            <Box m={5}>
-                {error ?
-                <Typography>
-                    Could not connect to docker error
-                </Typography> :
-                <TableContainer component={Paper}>
-                    <Table>
+        <Box m={5}>
+            <Paper>
+                <TableContainer style={{maxHeight: "450px"}}>
+                    <Table stickyHeader>
                         <TableHead>
                             <TableRow>
-                                <TableCell>CONTAINER ID</TableCell>
-                                <TableCell align="right">IMAGE</TableCell>
-                                <TableCell align="right">COMMAND</TableCell>
-                                <TableCell align="right">CREATED</TableCell>
-                                <TableCell align="right">STATUS</TableCell>
-                                <TableCell align="right">NAMES</TableCell>
+                                <TableCell>Container ID</TableCell>
+                                <TableCell>Image</TableCell>
+                                <TableCell>Command</TableCell>
+                                <TableCell>Created At</TableCell>
+                                <TableCell style={{minWidth: "75px"}}>Status</TableCell>
+                                <TableCell>Name</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
+                            {
+                                error ?
+                                    <TableRow>
+                                        <TableCell colSpan={6} rowSpan={6} align="center">Unable to connect to Docker daemon</TableCell>
+                                    </TableRow>
+                                    : null
+                            }
                             {(rowsPerPage > 0
-                                    ? containers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                    : containers
+                                ? containers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                : containers
                             ).map(container => (
-                                <TableRow key={container.Id}>
+                                <TableRow key={container.Id} hover>
                                     <TableCell component="th" scope="row">
-                                        <Link to={`/${jobuuid}/container/${container.Id}`} >{container.Id.substring(0, 11)}</Link>
+                                        <Link to={`/${jobUuid}/container/${container.Id}`} >{container.Id.substring(0, 11)}</Link>
                                     </TableCell>
-                                    <TableCell align="right">{container.ImageID.substring(7, 19)}</TableCell>
-                                    <TableCell align="right">{container.Command}</TableCell>
-                                    <TableCell align="right">{container.Created}</TableCell>
-                                    <TableCell align="right">{container.Status}</TableCell>
-                                    <TableCell align="right">{container.Names}</TableCell>
+                                    <TableCell>{container.ImageID.substring(7, 19)}</TableCell>
+                                    <TableCell>{container.Command}</TableCell>
+                                    <TableCell>{container.Created}</TableCell>
+                                    <TableCell>{container.Status}</TableCell>
+                                    <TableCell>{container.Names}</TableCell>
                                 </TableRow>
                             ))}
                             {emptyRows > 0 && (
@@ -87,25 +85,25 @@ function Dashboard() {
                                     <TableCell colSpan={6} />
                                 </TableRow>
                             )}
-                        </TableBody>
-                        <TablePagination
-                            rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-                            count={containers.length}
-                            rowsPerPage={rowsPerPage}
-                            page={page}
-                            SelectProps={{
-                                inputProps: { 'aria-label': 'rows per page' },
-                                native: true,
-                            }}
-                            onPageChange={handleChangePage}
-                            onRowsPerPageChange={handleChangeRowsPerPage}
-                        />
-                    </Table>
-                </TableContainer>
-            }
-            </Box>
-        </React.Fragment>
-)
+                          </TableBody>
+                        </Table>
+              </TableContainer>
+            <TablePagination
+                rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+                component="div"
+                count={containers.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                SelectProps={{
+                    inputProps: { 'aria-label': 'rows per page' },
+                    native: true,
+                }}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+            </Paper>
+      </Box>
+    )
 }
 
 export default Dashboard;

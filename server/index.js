@@ -4,30 +4,29 @@ const expressWs = require('express-ws')(expressApp);
 const port = 3001;
 const path = require('path');
 const Docker = require('dockerode');
-let { app } = expressWs;
+const { app } = expressWs;
+
+const FRONT_END_PATH = path.join(__dirname, '..', 'front-end', 'build')
 
 app.use(express.json());
 
-process.on('uncaughtException', err => {
-    // for some reason if docker does not connect it will throw an exception that cannot be caught
-    console.error(err, 'Uncaught Exception thrown');
-});
+app.use(express.static(FRONT_END_PATH));
 
-var setdocker = async function (req, res, next) {
-    var docker = new Docker({ protocol: 'ssh', host: `${req.params.jobuuid}.lan`, password: 'password', username: 'root'});
+const setDocker = async function (req, res, next) {
+    let docker = new Docker({ protocol: 'ssh', host: `${req.params.jobUuid}.lan`, password: 'password', username: 'root'});
     //ping docker to see if connection is working
     try {
         await docker.ping();
         req.docker = docker;
         next()
     } catch (err) {
-        res.send(err)
+        next(err)
     }
 }
 
-app.use(express.static(path.join(__dirname, '..', 'docker-dashboard-front-end', 'build')));
-app.get('/:jobuuid/containers', setdocker, (req, res, next) => {
-    req.docker.listContainers({all: true}, (err, containers) => {
+
+app.get('/:jobUuid/containers', setDocker, (req, res, next) => {
+    req.docker.listContainers({}, (err, containers) => {
         if (err) {
             console.error(err);
             next(err);
@@ -37,8 +36,8 @@ app.get('/:jobuuid/containers', setdocker, (req, res, next) => {
     })
 });
 
-app.get('/:jobuuid/container/:id', setdocker, (req, res, next) => {
-    req.docker.getContainer(req.params.id).inspect((err, container) => {
+app.get('/:jobUuid/container/:id', setDocker, (req, res, next) => {
+    req.docker.getContainer(req.params.id).inspect( {},(err, container) => {
         if (err) {
             console.error(err);
             next(err);
@@ -48,10 +47,10 @@ app.get('/:jobuuid/container/:id', setdocker, (req, res, next) => {
     })
 });
 
-app.ws('/:jobuuid/container/:id/logs', setdocker, async (ws, req) => {
+app.ws('/:jobUuid/container/:id/logs', setDocker, async (ws, req) => {
     const container = ws.docker.getContainer(req.params.id)
     if(!container) {
-        ws.send('Could not find container ' + containerName + '. Abort.');
+        ws.send('Could not find container.');
     }
     container.logs({
         follow: true,
@@ -59,10 +58,8 @@ app.ws('/:jobuuid/container/:id/logs', setdocker, async (ws, req) => {
         stderr: true
     }, (err, logs) => {
         if (err) {
-            ws.send("websocket errors encountered");
             console.error(err);
         } else {
-            ws.send("websocket connection established");
             logs.on('data', chunk => {
                 let encodedLogs = Buffer.from(chunk, 'utf-8').toString();
                 ws.send(encodedLogs);
@@ -72,10 +69,10 @@ app.ws('/:jobuuid/container/:id/logs', setdocker, async (ws, req) => {
 });
 
 app.get('*', function(req, res) {
-    res.sendFile('index.html', {root: path.join(__dirname, '..', 'docker-dashboard-front-end', 'build')});
+    res.sendFile('index.html', {root: FRONT_END_PATH});
 });
 
-app.use(function (err, req, res, next) {
+app.use(function (err, req, res) {
     console.error(err.stack)
     res.status(500).send({
         err : err.stack
