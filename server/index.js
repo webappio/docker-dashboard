@@ -47,11 +47,21 @@ app.get('/:jobUuid/container/:id', setDocker, (req, res, next) => {
     })
 });
 
-app.ws('/:jobUuid/container/:id/logs', setDocker, async (ws, req) => {
-    const container = ws.docker.getContainer(req.params.id)
+app.ws('/:jobUuid/container/:id/logs', async (ws, req) => {
+    let docker = new Docker({ protocol: 'ssh', host: `${req.params.jobUuid}.lan`, password: 'password', username: 'root'});
+
+    //ping docker to see if connection is working
+    try {
+        await docker.ping();
+    } catch (err) {
+        ws.Close();
+    }
+
+    let container = docker.getContainer(req.params.id)
     if(!container) {
         ws.send('Could not find container.');
     }
+
     container.logs({
         follow: true,
         stdout: true,
@@ -59,6 +69,7 @@ app.ws('/:jobUuid/container/:id/logs', setDocker, async (ws, req) => {
     }, (err, logs) => {
         if (err) {
             console.error(err);
+            ws.Close();
         } else {
             logs.on('data', chunk => {
                 let encodedLogs = Buffer.from(chunk, 'utf-8').toString();
