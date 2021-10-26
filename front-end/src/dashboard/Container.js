@@ -1,56 +1,90 @@
 import React, {useState, useEffect} from 'react';
 import {useParams} from "react-router";
 import { w3cwebsocket as W3CWebSocket } from "websocket";
-import {Button, Grid} from "@material-ui/core";
+import {Button, Typography} from "@material-ui/core";
 import {Terminal} from 'xterm';
 import 'xterm/css/xterm.css'
 import Box from "@material-ui/core/Box";
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import IconButton from '@material-ui/core/IconButton';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 
 function Container() {
-    const [connect, setConnect] = useState(false);
-    const { jobuuid, id } = useParams();
-    const term = new Terminal();
-    const protocol = window.location.protocol.replace('http', 'ws');
-    const hostname = window.location.hostname === 'localhost' ? 'localhost:3001' : window.location.hostname;
-    const client = new W3CWebSocket(`${protocol}//${hostname}/${jobuuid}/container/${id}/logs`);
+    const [container, setContainer] = useState({});
+    const { jobUuid, id } = useParams();
 
-    const streamLogs = () => {
-        term.open(document.getElementById('terminal'));
-        client.onopen = () => client.send('logs');
-        client.onmessage = function (event) {
-            term.writeln(event.data)
+    useEffect(() => {
+        const protocol = window.location.protocol.replace('http', 'ws');
+        const client = new W3CWebSocket(`${protocol}//${host}/${jobUuid}/container/${id}/logs`);
+        const term = new Terminal();
+
+        function streamLogs() {
+            term.open(document.getElementById('terminal'));
+            client.onopen = () => client.send('logs');
+            client.onmessage = function (event) {
+                term.writeln(event.data)
+            }
+            client.onerror = (error) => {
+                console.error(error)
+            }
         }
-        client.onerror = (error) => {
-            console.error(error)
+
+        streamLogs()
+    }, [id, jobUuid]);
+
+    useEffect(() => {
+        async function fetchContainer() {
+            try {
+                const res = await fetch(`/${jobUuid}/container/${id}`)
+                const result = await res.json()
+                setContainer(result)
+            } catch (reason) {
+                console.error(reason)
+            }
         }
-    }
-    
-    //eslint-disable-next-line
-    useEffect(() => connect ? streamLogs() : null, [connect]);
+        fetchContainer()
+    }, [id, jobUuid])
 
     return(
-        <div>
-            <IconButton>
-                <a href={`${window.location.protocol}//${window.location.hostname}${window.location.port === ''? '' : `:${window.location.port}`}/${jobuuid}`}>
-                    <ArrowBackIcon></ArrowBackIcon>
-                </a>
-            </IconButton>
-            <h1>{id}</h1>
-            <Button
-                onClick={() => { 
-                    setConnect(!connect)
-                }}
-                variant={'outlined'}>
-                {connect ? 'Close logs' : 'Connect to logs'}
-            </Button>
-            <Grid container justifyContent="center">
-                <Box m={3}>
-                    {connect ? <div id="terminal"/> : null}
+            <Box display="flex" flexDirection="column">
+                <Box margin={5} display="flex" flexDirection="row">
+                    <Button
+                        href={`/${jobUuid}`}
+                        startIcon={<ChevronLeftIcon/>}>
+                        Back
+                    </Button>
+                    <Box justifyContent="center" style={{width: "100%"}}>
+                        <Typography variant="h3">{(container && container.Id)? `Container: ${container.Id.substring(0, 11)}` : null}</Typography>
+                        <Typography>{(container && container.Id)? container.Name: null}</Typography>
+                    </Box>
                 </Box>
-            </Grid>
-        </div>
+                <Box display="flex" flexDirection="row">
+                    <Box marginLeft={5} display="flex" flexDirection="column">
+                        {
+                            (container && container.Id)? <>
+                                    <Box>
+                                        <Typography align="left">
+                                            Status: {container.State.Status}
+                                        </Typography>
+                                    </Box>
+                                    <Box marginTop={3}>
+                                        <Typography align="left">
+                                            Created at: {container.Created}
+                                        </Typography>
+                                    </Box>
+                                    <Box marginTop={3}>
+                                        <Typography align="left">
+                                            Started at: {container.State.StartedAt}
+                                        </Typography>
+                                    </Box>
+                                </>
+                                : null
+                        }
+
+                    </Box>
+                    <Box marginLeft={3} display="flex" style={{width: "100%"}} justifyContent="center">
+                        <div id="terminal"/>
+                    </Box>
+                </Box>
+            </Box>
     );
 }
 
