@@ -1,92 +1,97 @@
-import React, {useState, useEffect} from 'react';
-import {useParams} from "react-router";
-import { w3cwebsocket as W3CWebSocket } from "websocket";
-import {Button, Typography} from "@material-ui/core";
-import {Terminal} from 'xterm';
-import 'xterm/css/xterm.css'
-import Box from "@material-ui/core/Box";
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 
-function Container() {
-    const [container, setContainer] = useState({});
-    const { jobUuid, id } = useParams();
+  
+const express = require('express')
+const expressApp = express();
+const expressWs = require('express-ws')(expressApp);
+const port = 3001;
+const path = require('path');
+const Docker = require('dockerode');
+const { app } = expressWs;
 
-    useEffect(() => {
-        const protocol = window.location.protocol.replace('http', 'ws');
-        const host = window.location.host
-        const client = new W3CWebSocket(`${protocol}//${host}/${jobUuid}/container/${id}/logs`);
-        const term = new Terminal();
+const FRONT_END_PATH = path.join(__dirname, '..', 'front-end', 'build')
 
-        function streamLogs() {
-            term.open(document.getElementById('terminal'));
-            client.onopen = () => client.send('logs');
-            client.onmessage = function (event) {
-                term.writeln(event.data)
-            }
-            client.onerror = (error) => {
-                console.error(error)
-            }
-        }
+app.use(express.json());
 
-        streamLogs()
-    }, [id, jobUuid]);
+app.use(express.static(FRONT_END_PATH));
 
-    useEffect(() => {
-        async function fetchContainer() {
-            try {
-                const res = await fetch(`/${jobUuid}/container/${id}`)
-                const result = await res.json()
-                setContainer(result)
-            } catch (reason) {
-                console.error(reason)
-            }
-        }
-        fetchContainer()
-    }, [id, jobUuid])
-
-    return(
-            <Box display="flex" flexDirection="column">
-                <Box margin={5} display="flex" flexDirection="row">
-                    <Button
-                        href={`/${jobUuid}`}
-                        startIcon={<ChevronLeftIcon/>}>
-                        Back
-                    </Button>
-                    <Box justifyContent="center" style={{width: "100%"}}>
-                        <Typography variant="h3">{(container && container.Id)? `Container: ${container.Id.substring(0, 11)}` : null}</Typography>
-                        <Typography>{(container && container.Id)? container.Name: null}</Typography>
-                    </Box>
-                </Box>
-                <Box display="flex" flexDirection="row">
-                    <Box marginLeft={5} display="flex" flexDirection="column">
-                        {
-                            (container && container.Id)? <>
-                                    <Box>
-                                        <Typography align="left">
-                                            Status: {container.State.Status}
-                                        </Typography>
-                                    </Box>
-                                    <Box marginTop={3}>
-                                        <Typography align="left">
-                                            Created at: {container.Created}
-                                        </Typography>
-                                    </Box>
-                                    <Box marginTop={3}>
-                                        <Typography align="left">
-                                            Started at: {container.State.StartedAt}
-                                        </Typography>
-                                    </Box>
-                                </>
-                                : null
-                        }
-
-                    </Box>
-                    <Box marginLeft={3} display="flex" style={{width: "100%"}} justifyContent="center">
-                        <div id="terminal"/>
-                    </Box>
-                </Box>
-            </Box>
-    );
+const setDocker = async function (req, res, next) {
+    let docker = new Docker({ protocol: 'ssh', host: `${req.params.jobUuid}.lan`, password: 'password', username: 'root'});
+    //ping docker to see if connection is working
+    try {
+        await docker.ping();
+        req.docker = docker;
+        next()
+    } catch (err) {
+        next(err)
+    }
 }
 
-export default Container;
+
+app.get('/:jobUuid/containers', setDocker, (req, res, next) => {
+    req.docker.listContainers({}, (err, containers) => {
+        if (err) {
+            console.error(err);
+            next(err);
+        } else {
+            res.send(containers);
+        }
+    })
+});
+
+app.get('/:jobUuid/container/:id', setDocker, (req, res, next) => {
+    req.docker.getContainer(req.params.id).inspect( {},(err, container) => {
+        if (err) {
+            console.error(err);
+            next(err);
+        } else {
+            res.send(container);
+        }
+    })
+});
+
+app.ws('/:jobUuid/container/:id/logs', async (ws, req) => {
+    let docker = new Docker({ protocol: 'ssh', host: `${req.params.jobUuid}.lan`, password: 'password', username: 'root'});
+
+    //ping docker to see if connection is working
+    try {
+        await docker.ping();
+    } catch (err) {
+        ws.Close();
+    }
+
+    let container = docker.getContainer(req.params.id)
+    if(!container) {
+        ws.send('Could not find container.');
+    }
+
+    container.logs({
+        follow: true,
+        stdout: true,
+        stderr: true
+    }, (err, logs) => {
+        if (err) {
+            console.error(err);
+            ws.Close();
+        } else {
+            logs.on('data', chunk => {
+                let encodedLogs = Buffer.from(chunk, 'utf-8').toString();
+                ws.send(encodedLogs);
+            })
+        }
+    })
+});
+
+app.get('*', function(req, res) {
+    res.sendFile('index.html', {root: FRONT_END_PATH});
+});
+
+app.use(function (err, req, res) {
+    console.error(err.stack)
+    res.status(500).send({
+        err : err.stack
+    })
+})
+
+app.listen(port, () => {
+    console.log(`Docker plugin dashboard listening on http://localhost:${port}`)
+});
