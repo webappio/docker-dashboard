@@ -14,6 +14,7 @@ app.use(express.json());
 
 app.use(express.static(FRONT_END_PATH));
 
+
 const setDocker = async function (req, res, next) {
     let docker = new Docker({ protocol: 'ssh', host: `${req.params.jobUuid}.lan`, password: 'password', username: 'root'});
     //ping docker to see if connection is working
