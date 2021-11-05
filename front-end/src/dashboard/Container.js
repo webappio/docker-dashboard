@@ -35,7 +35,7 @@ function Container() {
 
     useEffect(() => {
         const protocol = window.location.protocol.replace('http', 'ws');
-        const host = "localhost:3001"
+        const host = window.location.host
         const client = new W3CWebSocket(`${protocol}//${host}/${jobUuid}/container/${id}/logs`);
         const term = new Terminal({
             rows: 20,

@@ -32,7 +32,7 @@ function Dashboard() {
                 setError(true)
             }
         }
-        console.log("RETRY")
+        
         fetchContainers()
     }, [jobUuid, refresh])
 
