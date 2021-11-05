@@ -10,12 +10,14 @@ import Paper from '@material-ui/core/Paper';
 import {Link} from "react-router-dom";
 import Box from '@material-ui/core/Box';
 import {useParams} from "react-router-dom";
+import {Button, Typography} from "@material-ui/core";
 
 function Dashboard() {
     const [containers, setContainers] = useState([]);
     const [page, setPage] = useState(0);
     const [error, setError] = useState(false);
     const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [refresh, setRefresh] = useState(false);
     const { jobUuid } = useParams();
 
     useEffect(() => {
@@ -30,8 +32,9 @@ function Dashboard() {
                 setError(true)
             }
         }
+        console.log("RETRY")
         fetchContainers()
-    }, [jobUuid])
+    }, [jobUuid, refresh])
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -61,7 +64,16 @@ function Dashboard() {
                             {
                                 error ?
                                     <TableRow>
-                                        <TableCell colSpan={6} rowSpan={6} align="center">Unable to connect to Docker daemon</TableCell>
+                                        <TableCell colSpan={6} rowSpan={6} align="center">
+                                            <Typography>
+                                                Unable to connect to Docker daemon
+                                            </Typography>
+                                            <Box margin={1}>
+                                                <Button color="primary" variant="contained" onClick={() => (setRefresh(!refresh))}>
+                                                    Refresh
+                                                </Button>
+                                            </Box>
+                                        </TableCell>
                                     </TableRow>
                                     : null
                             }
