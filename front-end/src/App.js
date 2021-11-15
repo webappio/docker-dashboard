@@ -4,6 +4,7 @@ import NotFound from './dashboard/Notfound'
 import './App.css';
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import React from "react";
+import ContainerDetails from "./dashboard/ContainerDetails";
 
 function App() {
   return (
@@ -15,6 +16,9 @@ function App() {
             </Route>
             <Route exact path="/:jobUuid">
                 <Dashboard/>
+            </Route>
+            <Route exact path="/:jobUuid/views/container-details">
+                <ContainerDetails/>
             </Route>
             <Route exact path="/:jobUuid/container/:id">
                 <Container/>

@@ -1,0 +1,19 @@
+.status-success {
+    color: #549D90;
+}
+
+.status-failure {
+    color: #822525;
+}
+
+.section {
+
+}
+
+.section.stopped-containers  hr {
+    border-color: #206E5F;
+}
+
+.section.stopped-containers {
+    background-color: #258271;
+}
