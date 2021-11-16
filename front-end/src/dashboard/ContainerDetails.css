@@ -1,0 +1,52 @@
+.status-success {
+    color: #549D90;
+}
+
+.status-failure {
+    color: #822525;
+}
+
+.main-container {
+    border-radius: 15px;
+    overflow: hidden;
+    margin-top: 30px
+}
+
+.section {
+    flex: 1 1 auto;
+    border-radius: 15px;
+}
+
+.section h5 {
+    font-size: 22px;
+    margin: 15px 0;
+}
+
+.section .status-subtext {
+    font-size: 50px;
+    margin: 25px 0;
+}
+
+.section.running-containers hr {
+    border-color: #206E5F;
+}
+
+.section.running-containers {
+    background-color: #258271;
+    color: #FFFFFF;
+}
+
+.section.stopped-containers hr {
+    border-color: #AC4343;
+}
+
+.section.stopped-containers {
+    background-color: #C65858;
+    color: #FFFFFF;
+}
+
+.topbar-text {
+    margin: 0;
+    padding: 0;
+    font-size: 17px;
+}
