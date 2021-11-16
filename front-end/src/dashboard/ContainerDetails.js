@@ -18,7 +18,7 @@ export default function ContainerDetails() {
     const nonRunningContainers = containers.filter(({State}) => State !== "running");
 
     const status = <span className={nonRunningContainers.length > 0 ? "status-failure" : "status-success"}>
-        <i className="feather icon-x-circle"/>&nbsp;{nonRunningContainers.length > 0 ? nonRunningContainers.length +" Errors" : "Success"}
+        <i className="feather icon-check-circle"/>&nbsp;{nonRunningContainers.length > 0 ? nonRunningContainers.length +" Errors" : "Success"}
     </span>
 
     const sections = [];
@@ -37,12 +37,18 @@ export default function ContainerDetails() {
         </div>)
     }
 
+    if(sections.length === 0) {
+        sections.push(<div className="section stopped-containers">
+            <h5>No containers found</h5>
+        </div>)
+    }
+
     return <Box display="flex" flexDirection="column" padding="30px">
-        <Box display="flex" flexDirection="row">
-            <h5>Docker Containers</h5>
+        <Box display="flex" flexDirection="row" justifyContent="space-between" alignItems="center">
+            <h5 className="topbar-text">Docker Containers</h5>
             {status}
         </Box>
-        <Box display="flex" borderRadius="25px">
+        <Box display="flex" className="main-container">
             {sections}
         </Box>
     </Box>
