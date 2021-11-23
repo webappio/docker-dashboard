@@ -72,7 +72,7 @@ function Container() {
     }, [id, jobUuid])
 
     return(
-        <Box display="flex" flexDirection="column" padding={3}>
+        <Box display="flex" flexDirection="column" paddingBottom={3}>
             <Box margin={5} display="flex" flexDirection="row">
                 <Box marginLeft={5}>
                     <IconButton
