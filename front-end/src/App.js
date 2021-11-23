@@ -17,7 +17,7 @@ function App() {
             <Route exact path="/:jobUuid">
                 <Dashboard/>
             </Route>
-            <Route exact path="/:jobUuid/views/container-details">
+            <Route exact path="/:jobUuid/views/widget">
                 <ContainerDetails/>
             </Route>
             <Route exact path="/:jobUuid/container/:id">

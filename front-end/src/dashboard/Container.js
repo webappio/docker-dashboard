@@ -1,11 +1,11 @@
 import React, {useState, useEffect} from 'react';
 import {useParams} from "react-router";
 import { w3cwebsocket as W3CWebSocket } from "websocket";
-import {Button, Typography} from "@material-ui/core";
+import {IconButton, Typography} from "@material-ui/core";
 import {Terminal} from 'xterm';
 import 'xterm/css/xterm.css'
 import Box from "@material-ui/core/Box";
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import {ArrowBack} from "@material-ui/icons";
 
 const LayerXtermTheme = {
     foreground: "#FFFFFF",
@@ -51,7 +51,7 @@ function Container() {
             padding: "20px"
         });
 
-        function streamLogs() {
+        const streamLogs = () => {
             term.open(document.getElementById('terminal'));
             client.onopen = () => client.send('logs');
             client.onmessage = function (event) {
@@ -65,79 +65,81 @@ function Container() {
     }, [id, jobUuid]);
 
     useEffect(() => {
-        async function fetchContainer() {
-            try {
-                const res = await fetch(`/${jobUuid}/container/${id}`)
-                const result = await res.json()
-                setContainer(result)
-            } catch (reason) {
-                console.error(reason)
-            }
-        }
-        fetchContainer()
+        fetch(`/${jobUuid}/container/${id}`)
+            .then(x => x.json())
+            .then(x => setContainer(x))
+            .catch(e => console.error(e));
     }, [id, jobUuid])
 
     return(
-            <Box display="flex" flexDirection="column">
-                <Box margin={5} display="flex" flexDirection="row">
-                    <Box marginLeft={5}>
-                        <Button
-                            href={`/${jobUuid}`}
-                            startIcon={<ChevronLeftIcon/>}>
-                            Back
-                        </Button>
-                    </Box>
-                    <Box justifyContent="center" style={{width: "100%"}}>
-                        <Typography variant="h3">{(container && container.Id)? `Container: ${container.Id.substring(0, 11)}` : null}</Typography>
-                        <Typography>{(container && container.Id)? container.Name: null}</Typography>
-                    </Box>
+        <Box display="flex" flexDirection="column" padding={3}>
+            <Box margin={5} display="flex" flexDirection="row">
+                <Box marginLeft={5}>
+                    <IconButton
+                        href={`/${jobUuid}`}
+                    >
+                        <ArrowBack/>
+                    </IconButton>
                 </Box>
-                <Box display="flex" flexDirection="row" justifyContent="center">
-                    <Box marginLeft={5} display="flex" flexDirection="column">
-                        {
-                            (container && container.Id)? <>
-                                    <Box>
-                                        <Typography align="left" color="textSecondary">
-                                            Status:
-                                        </Typography>
-                                        <Typography align="left">
-                                            {container.State.Status}
-                                        </Typography>
-                                    </Box>
-                                    <Box marginTop={3}>
-                                        <Typography align="left" color="textSecondary">
-                                            Created at:
-                                        </Typography>
-                                        <Typography align="left">
-                                            {container.Created}
-                                        </Typography>
-                                    </Box>
-                                    <Box marginTop={3}>
-                                        <Typography align="left" color="textSecondary">
-                                            Started at:
-                                        </Typography>
-                                        <Typography align="left">
-                                            {container.State.StartedAt}
-                                        </Typography>
-                                    </Box>
-                                    <Box marginTop={3}>
-                                        <Typography align="left" color="textSecondary">
-                                            IP address:
-                                        </Typography>
-                                        <Typography align="left">
-                                            {container.NetworkSettings.IPAddress}
-                                        </Typography>
-                                    </Box>
-                                </>
-                                : null
-                        }
-
-                    </Box>
-                    <Box marginLeft={3} display="flex" style={{paddingLeft: "1em", backgroundColor: "#222433"}} textAlign="left">
-                        <div id="terminal"/>
-                    </Box>
+                <Box justifyContent="center" style={{width: "100%"}}>
+                    <Typography variant="h3">{(container && container.Id)? `Container: ${container.Id.substring(0, 11)}` : null}</Typography>
+                    <Typography>{(container && container.Id)? container.Name: null}</Typography>
                 </Box>
             </Box>
+            <Box display="flex" flexDirection="row" justifyContent="center">
+                <Box marginLeft={5} display="flex" flexDirection="column">
+                    {
+                        (container && container.Id)? <>
+                                <Box>
+                                    <Typography align="left" color="textSecondary">
+                                        Status:
+                                    </Typography>
+                                    <Typography align="left">
+                                        {container.State.Status}
+                                    </Typography>
+                                </Box>
+                                <Box marginTop={3}>
+                                    <Typography align="left" color="textSecondary">
+                                        Created at:
+                                    </Typography>
+                                    <Typography align="left">
+                                        {container.Created}
+                                    </Typography>
+                                </Box>
+                                <Box marginTop={3}>
+                                    <Typography align="left" color="textSecondary">
+                                        Started at:
+                                    </Typography>
+                                    <Typography align="left">
+                                        {container.State.StartedAt}
+                                    </Typography>
+                                </Box>
+                                <Box marginTop={3}>
+                                    <Typography align="left" color="textSecondary">
+                                        IP address:
+                                    </Typography>
+                                    <Typography align="left">
+                                        {container.NetworkSettings.IPAddress}
+                                    </Typography>
+                                </Box>
+                            </>
+                            : null
+                    }
+
+                </Box>
+                <Box
+                    marginLeft={3}
+                    display="flex"
+                    style={{
+                        padding: "1em",
+                        backgroundColor: "#222433",
+                        borderRadius: 10
+                    }}
+                    textAlign="left">
+                    <div id="terminal"/>
+                </Box>
+            </Box>
+        </Box>
     );
 }
 
